@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripGo India — Bus, Flights, Trains & Hotels</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root{--primary:#e53935;--dark:#171717;--muted:#6c757d;--soft:#fff5f4}
+*{box-sizing:border-box} body{margin:0;background:#f6f7f9;color:#202124;font-family:Inter,Segoe UI,Arial,sans-serif}
+.navbar{background:#fff}.brand{font-size:1.5rem;font-weight:800;color:var(--primary)!important}
+.hero{min-height:430px;background:linear-gradient(90deg,rgba(0,0,0,.68),rgba(0,0,0,.25)),url("https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1800&q=85") center/cover;display:flex;align-items:center}
+.hero h1{font-size:clamp(2.2rem,5vw,4rem);font-weight:800}.hero p{font-size:1.15rem}
+.booking{margin-top:-85px;position:relative;z-index:3}.booking-box,.cardx,.result{background:#fff;border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}
+.booking-box{padding:20px}.tab{border:0;background:transparent;padding:13px 18px;font-weight:700;color:#777;border-bottom:3px solid transparent}.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.form-control,.form-select{border-radius:10px;padding:11px}.form-control:focus,.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 .15rem rgba(229,57,53,.12)}
+.btn-primaryx{background:var(--primary);color:#fff;border:0;border-radius:10px;font-weight:700;padding:11px 20px}.btn-primaryx:hover{background:#c62828;color:#fff}
+.swap{border:1px solid #ddd;border-radius:50%;width:38px;height:38px;background:#fff;color:var(--primary)}
+.result{padding:18px;margin-bottom:14px;transition:.2s}.result:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.1)}
+.logo{width:52px;height:52px;border-radius:12px;background:#fff0ef;color:var(--primary);display:grid;place-items:center;font-size:1.35rem;font-weight:800}
+.price{font-size:1.3rem;font-weight:800}.pill{background:#eef9f0;color:#238636;border-radius:20px;padding:5px 10px;font-size:.8rem;font-weight:700}
+.photo{width:100%;height:150px;object-fit:cover;border-radius:14px}.route{display:flex;align-items:center;gap:8px;color:#555;font-size:.9rem}.line{height:2px;background:#ddd;flex:1}
+.seat-grid{display:grid;grid-template-columns:repeat(4,42px);gap:10px;justify-content:center;margin:18px auto}.seat{width:42px;height:42px;border:1px solid #b8b8b8;border-radius:9px;background:#fff;font-size:.75rem}.seat.booked{background:#e9ecef;color:#999;cursor:not-allowed}.seat.selected{background:#1976d2;color:#fff;border-color:#1976d2}.seat.available:hover{border-color:var(--primary);color:var(--primary)}
+.legend span{display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:.82rem}.dot{width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid #aaa}.d-av{background:#fff}.d-sel{background:#1976d2}.d-book{background:#e9ecef}
+.route-stop{position:relative;padding-left:25px;padding-bottom:18px}.route-stop:before{content:"";position:absolute;left:5px;top:6px;width:10px;height:10px;background:var(--primary);border-radius:50%}.route-stop:after{content:"";position:absolute;left:9px;top:16px;width:2px;height:calc(100% - 10px);background:#ddd}.route-stop:last-child:after{display:none}
+.vehicle-photo{height:220px;width:100%;object-fit:cover;border-radius:14px}
+.auth-bg{background:#f6f7f9}.modal-content{border:0;border-radius:20px}.hidden{display:none!important}
+.toastbox{position:fixed;right:20px;bottom:20px;z-index:9999}.destination{height:190px;border-radius:16px;overflow:hidden;position:relative}.destination img{width:100%;height:100%;object-fit:cover;transition:.3s}.destination:hover img{transform:scale(1.05)}.destination div{position:absolute;inset:0;display:flex;align-items:end;padding:16px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+@media(max-width:768px){.hero{min-height:380px}.booking{margin-top:-45px}.tab{padding:10px 11px;font-size:.85rem}.seat-grid{grid-template-columns:repeat(4,38px)}.seat{width:38px;height:38px}}
+
+.bus-subnav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}.bus-subnav button{border:1px solid #dee2e6;background:#fff;border-radius:12px;padding:10px 16px;font-weight:700}.bus-subnav button.active{background:#111;color:#fff;border-color:#111}.bus-page{display:none}.bus-page.active{display:block}.bus-subnav button{border:1px solid #ddd;background:#fff;padding:10px 16px;border-radius:12px;font-weight:700}.bus-subnav button.active{background:#111;color:#fff}.bus-subnav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.page-note{background:#f8f9fa;border:1px solid #e5e5e5;padding:12px;border-radius:12px;margin-bottom:14px}.vehicle-photo{width:100%;height:260px;object-fit:cover;border-radius:16px}.page-note{background:#f8f9fa;border:1px solid #e9ecef;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px}
+
+.bus-info-scroll{max-height:125px;overflow-y:auto;padding-right:6px;margin-top:8px;border:1px solid #eee;border-radius:10px;background:#fafafa}
+.bus-info-scroll::-webkit-scrollbar{width:7px}.bus-info-scroll::-webkit-scrollbar-thumb{background:#bbb;border-radius:10px}
+.bus-card-photo{width:100%;height:150px;object-fit:cover;border-radius:14px;background:#eee}
+.bus-seat-panel{background:#f8faf8;border:1px solid #dce9df;border-radius:12px;padding:10px;margin-top:8px}
+.stop-chip{display:inline-block;background:#fff;border:1px solid #e3e3e3;border-radius:999px;padding:4px 8px;margin:2px;font-size:11px}
+.route-line-box{background:#fff7f6;border:1px solid #f0d8d5;border-radius:12px;padding:10px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg border-bottom sticky-top">
+<div class="container py-2">
+<a class="navbar-brand brand" href="#"><i class="bi bi-compass-fill"></i> TripGo India</a>
+<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+<div id="nav" class="collapse navbar-collapse">
+<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+<li class="nav-item"><a class="nav-link" href="#search">Book</a></li>
+<li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
+<li class="nav-item"><a class="nav-link" href="#offers">Offers</a></li>
+<li class="nav-item"><span id="userArea"><button class="btn btn-outline-danger rounded-pill px-4" onclick="openAuth('login')">Login / Register</button></span></li>
+</ul></div></div>
+</nav>
+
+<section class="hero">
+<div class="container text-white">
+<h1>Travel Across India.<br>One Place to Book.</h1>
+<p>Search buses, trains, flights and hotels across hundreds of Indian cities.</p>
+<span class="badge bg-light text-dark p-2"><i class="bi bi-shield-check"></i> Secure demo booking experience</span>
+</div>
+</section>
+
+<section id="search" class="container booking">
+<div class="booking-box">
+<div class="d-flex flex-wrap border-bottom mb-3">
+<button class="tab active" data-type="bus" onclick="setType('bus',this)"><i class="bi bi-bus-front"></i> Bus</button>
+<button class="tab" data-type="train" onclick="setType('train',this)"><i class="bi bi-train-front"></i> Trains</button>
+<button class="tab" data-type="flight" onclick="setType('flight',this)"><i class="bi bi-airplane"></i> Flights</button>
+<button class="tab" data-type="hotel" onclick="setType('hotel',this)"><i class="bi bi-building"></i> Hotels</button>
+</div>
+
+<div id="transportForm">
+<div class="row g-3 align-items-end">
+<div class="col-lg-3 col-md-6">
+<label class="small fw-bold text-muted">FROM / BOARDING</label>
+<select id="from" class="form-select"></select>
+</div>
+<div class="col-lg-1 col-md-6 text-center"><button class="swap" onclick="swapPlaces()"><i class="bi bi-arrow-left-right"></i></button></div>
+<div class="col-lg-3 col-md-6">
+<label class="small fw-bold text-muted">TO / DROPPING</label>
+<select id="to" class="form-select"></select>
+</div>
+<div class="col-lg-2 col-md-6">
+<label class="small fw-bold text-muted">TRIP DATE</label>
+<input id="date" type="date" class="form-control">
+</div>
+<div class="col-lg-2 col-md-6"><label class="small fw-bold text-muted">TRAVELLERS</label><select id="travellers" class="form-select"><option>1 Traveller</option><option>2 Travellers</option><option>3 Travellers</option><option>4 Travellers</option><option>5 Travellers</option></select></div>
+<div class="col-lg-1 col-md-6"><button class="btn-primaryx w-100" onclick="searchRoutes()"><i class="bi bi-search"></i></button></div>
+</div>
+</div>
+
+<div id="hotelForm" class="hidden">
+<div class="row g-3 align-items-end">
+<div class="col-lg-4"><label class="small fw-bold text-muted">CITY / DESTINATION</label><select id="hotelCity" class="form-select"></select></div>
+<div class="col-lg-2"><label class="small fw-bold text-muted">CHECK-IN</label><input type="date" class="form-control"></div>
+<div class="col-lg-2"><label class="small fw-bold text-muted">CHECK-OUT</label><input type="date" class="form-control"></div>
+<div class="col-lg-2"><label class="small fw-bold text-muted">GUESTS</label><select class="form-select"><option>2 Guests</option><option>1 Guest</option><option>4 Guests</option></select></div>
+<div class="col-lg-2"><button class="btn-primaryx w-100" onclick="searchHotels()">Search</button></div>
+</div>
+</div>
+</div>
+</section>
+
+
+
+<main class="container my-5">
+<div id="resultsSection" class="hidden">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+<div><h3 id="resultsTitle" class="fw-bold mb-1">Routes</h3><p id="resultsSub" class="text-muted mb-0"></p></div>
+<select id="sort" class="form-select w-auto" onchange="sortResults(this.value)"><option value="default">Sort</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="time">Earliest Departure</option></select>
+</div>
+<div id="results"></div>
+</div>
+
+<section id="destinations" class="mt-5">
+<div class="d-flex justify-content-between align-items-center mb-3"><div><h3 class="fw-bold">Popular India Routes</h3><p class="text-muted">Start with a popular city pair.</p></div></div>
+<div class="row g-3">
+<div class="col-6 col-md-3"><div class="destination" onclick="quickRoute('Mumbai','Pune')"><img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=700&q=80"><div><b>Mumbai → Pune</b></div></div></div>
+<div class="col-6 col-md-3"><div class="destination" onclick="quickRoute('Delhi','Jaipur')"><img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=700&q=80"><div><b>Delhi → Jaipur</b></div></div></div>
+<div class="col-6 col-md-3"><div class="destination" onclick="quickRoute('Bengaluru','Chennai')"><img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=700&q=80"><div><b>Bengaluru → Chennai</b></div></div></div>
+<div class="col-6 col-md-3"><div class="destination" onclick="quickRoute('Mumbai','Goa')"><img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=700&q=80"><div><b>Mumbai → Goa</b></div></div></div>
+</div>
+</section>
+
+<section id="offers" class="my-5">
+<div class="cardx p-4 p-md-5 text-white" style="background:linear-gradient(135deg,#e53935,#ff7043)">
+<div class="row align-items-center"><div class="col-md-8"><h2 class="fw-bold">Travel smarter with TripGo</h2><p class="mb-0">Compare routes, check seats and build your journey in one place.</p></div><div class="col-md-4 text-md-end mt-3 mt-md-0"><button class="btn btn-light fw-bold rounded-pill px-4" onclick="toast('Offers: BUS200, FLY10, TRAIN150 and HOTEL25')">View Offers</button></div></div>
+</div>
+</section>
+</main>
+
+<footer class="bg-white border-top py-4">
+<div class="container d-flex flex-wrap justify-content-between gap-3">
+<div><b class="text-danger fs-5"><i class="bi bi-compass-fill"></i> TripGo India</b><div class="text-muted small">Bus • Train • Flight • Hotel</div></div>
+<div class="text-muted small">© 2026 TripGo. Demo booking platform.</div>
+</div>
+</footer>
+
+<!-- DETAILS MODAL -->
+<div class="modal fade" id="detailsModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 id="detailsTitle" class="modal-title fw-bold"></h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div id="detailsBody" class="modal-body"></div></div></div></div>
+
+<!-- AUTH MODAL -->
+<div class="modal fade" id="authModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 id="authTitle" class="modal-title fw-bold">Login</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+<div id="registerFields" class="hidden"><label class="form-label">Full Name</label><input id="regName" class="form-control mb-3" placeholder="Your name"></div>
+<label class="form-label">Email</label><input id="authEmail" type="email" class="form-control mb-3" placeholder="you@example.com">
+<label class="form-label">Password</label><input id="authPassword" type="password" class="form-control mb-3" placeholder="Minimum 4 characters">
+<button class="btn-primaryx w-100" onclick="submitAuth()">Continue</button>
+<div class="text-center mt-3 small"> <span id="authSwitchText">New here?</span> <button class="btn btn-link p-0" id="authSwitch" onclick="toggleAuth()">Create account</button></div>
+</div></div></div></div>
+
+<!-- SEAT / BOOKING MODAL -->
+<div class="modal fade" id="seatModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><div><h5 id="seatTitle" class="modal-title fw-bold"></h5><small id="seatRoute" class="text-muted"></small></div><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+<div id="vehicleImageWrap" class="mb-3"></div>
+<div class="row g-4">
+<div class="col-md-7"><h6 class="fw-bold">Select Seats</h6><div class="legend mb-2"><span><i class="dot d-av"></i> Available</span><span><i class="dot d-sel"></i> Selected</span><span><i class="dot d-book"></i> Booked</span></div><div id="seatGrid" class="seat-grid"></div></div>
+<div class="col-md-5"><div class="cardx p-3"><h6 class="fw-bold">Route & Seat Selection</h6><div id="routeStops"></div><hr><div class="d-flex justify-content-between"><span>Selected Seats</span><b id="selectedSeats">None</b></div><div class="d-flex justify-content-between mt-2"><span>Total</span><b id="totalFare">₹0</b></div><button class="btn-primaryx w-100 mt-3" onclick="continueBooking()">Continue</button></div></div>
+</div></div></div></div>
+
+<div class="toastbox"><div id="toastMsg" class="alert alert-dark shadow hidden"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let type="bus", results=[], selected=[], activeItem=null, authMode="login", selectedTripDate="";
+
+const cities=[
+"Mumbai","Pune","Delhi","Bengaluru","Hyderabad","Chennai","Kolkata","Ahmedabad","Jaipur","Goa","Nagpur","Indore","Surat","Lucknow","Bhopal","Patna","Chandigarh","Kochi","Varanasi","Amritsar","Nashik","Mysuru","Coimbatore","Ranchi","Bhubaneswar","Agra","Kanpur","Vadodara","Rajkot","Noida","Gurugram","Ghaziabad","Faridabad","Dehradun","Haridwar","Shimla","Srinagar","Jammu","Udaipur","Jodhpur","Ajmer","Gwalior","Jabalpur","Raipur","Vijayawada","Visakhapatnam","Tirupati","Madurai","Trichy","Mangalore","Hubballi","Belagavi","Thiruvananthapuram","Kozhikode","Guwahati","Siliguri","Durgapur","Cuttack","Prayagraj","Meerut","Mathura","Aligarh","Bareilly","Moradabad","Muzaffarpur","Gaya","Darbhanga","Jamshedpur","Dhanbad","Bokaro","Bikaner",
+"Mumbai","Navi Mumbai","Thane","Mira Road","Vasai","Virar","Kalyan","Dombivli","Ulhasnagar","Bhiwandi","Badlapur","Panvel","Alibag","Pen","Uran","Palghar","Boisar","Dahanu","Mahad","Roha","Murud","Shrivardhan","Dapoli",
+"Pune","Pimpri-Chinchwad","Lonavala","Talegaon","Chakan","Rajgurunagar","Junnar","Narayangaon","Shirur","Daund","Indapur","Baramati","Akluj","Saswad","Jejuri","Wai","Satara","Karad","Phaltan","Mahabaleshwar",
+"Nashik","Igatpuri","Sinnar","Sangamner","Shirdi","Kopargaon","Shrirampur","Ahmednagar","Ahilyanagar","Malegaon","Nandgaon",
+"Dhule","Shirpur","Nandurbar","Jalgaon","Bhusawal","Chalisgaon","Pachora","Amalner",
+"Chhatrapati Sambhajinagar","Aurangabad","Jalna","Sillod","Paithan","Akola","Washim","Buldhana","Shegaon","Khamgaon","Malkapur",
+"Nagpur","Wardha","Bhandara","Gondia","Chandrapur","Ballarpur","Gadchiroli","Amravati","Yavatmal",
+"Nanded","Latur","Parbhani","Hingoli","Beed","Dharashiv","Osmanabad","Ambajogai","Udgir","Kalamnuri",
+"Kolhapur","Ichalkaranji","Kagal","Gadhinglaj","Ajra","Gargoti","Radhanagari","Gaganbawda","Chandgad","Peth Vadgaon","Kurundwad","Jaisingpur","Hatkanangale",
+"Sangli","Miraj","Islampur","Vita","Tasgaon","Jath","Kavathe Mahankal",
+"Ratnagiri","Chiplun","Khed","Rajapur","Sawantwadi","Kankavli","Malvan","Sangameshwar","Sindhudurg",
+"Bhusawal","Dhule","Jalgaon","Nandurbar","Pandharpur","Indore","Bhopal","Ujjain","Gwalior","Jabalpur","Burhanpur","Khandwa","Dewas","Ratlam","Sagar","Rewa","Satna","Chhindwara",
+"Lucknow","Kanpur","Varanasi","Prayagraj","Agra","Mathura","Meerut","Bareilly","Moradabad","Aligarh","Ghaziabad","Noida","Gorakhpur","Ayodhya","Jhansi","Firozabad","Etawah","Unnao","Saharanpur"
+];
+
+const busOperators=["VRL Travels","Neeta Travels","IntrCity SmartBus","SRS Travels","Orange Tours","Zingbus","MSRTC","KSRTC","RSRTC","GSRTC","UPSRTC"];
+const airlines=["IndiGo","Air India","Akasa Air","SpiceJet","Air India Express"];
+const trains=["Vande Bharat","Rajdhani Express","Shatabdi Express","Duronto Express","Intercity Express"];
+
+function populateCities(){
+ const from=document.getElementById("from"), to=document.getElementById("to"), hotel=document.getElementById("hotelCity");
+ [from,to,hotel].forEach(el=>{
+   if(!el)return;
+   el.innerHTML="";
+   cities.forEach(c=>{
+     const o=document.createElement("option");
+     o.value=c;o.textContent=c;
+     el.appendChild(o);
+   });
+ });
+ from.value="Pune";to.value="Mumbai";hotel.value="Goa";
+}
+
+function setDefaultDates(){
+ const today=new Date();
+ const iso=today.toISOString().split("T")[0];
+ const date=document.getElementById("date");
+ date.min=iso;
+ date.value=iso;
+ document.querySelectorAll('#hotelForm input[type="date"]').forEach(x=>{x.min=iso});
+ selectedTripDate=iso;
+}
+
+function formatDate(value){
+ if(!value)return "Not selected";
+ const d=new Date(value+"T00:00:00");
+ return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+
+
+/* VERIFIED TIMETABLE DATA — refreshed from published timetable sources in Sep 2026.
+   Only entries below are presented as verified schedules. Other routes are not fabricated. */
+const VERIFIED_SCHEDULES = {
+  bus: {
+    'Pune|Jalgaon': [
+      ['MSRTC','07:00 AM','Jalgaon','Parivartan / Ordinary','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','07:15 AM','Jalgaon','Parivartan / Ordinary','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','08:30 AM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','10:00 AM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','12:00 PM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','02:00 PM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','04:00 PM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','06:00 PM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['MSRTC','09:30 PM','Jalgaon','Express','All Days',null,'Pune → Jalgaon; published MSRTC listing'],
+      ['VRL Travels','08:00 PM','Jalgaon','Eicher AC Sleeper','Published listing',33,'Pune → Jalgaon; overnight'],
+      ['Sangitam Travels','09:55 PM','Jalgaon','AC Sleeper (2+1)','Published listing',21,'Pune → Jalgaon; overnight'],
+      ['Bhagyalaxmi Travels','08:05 PM','Jalgaon','Volvo 9600 SLX Multi-Axle AC Sleeper (2+1)','Published listing',1,'Pune → Jalgaon; overnight'],
+      ['Pankaj & Jain Travels','08:00 PM','Jalgaon','Volvo 9600 SLX Multi-Axle AC Sleeper (2+1)','Published listing',14,'Pune → Jalgaon; overnight'],
+      ['Shri Sairam Travels','08:30 PM','Jalgaon','AC Sleeper','Published listing',null,'Pune → Jalgaon; overnight'],
+      ['Jogeshwari Enterprises','09:00 PM','Jalgaon','Sleeper / AC Sleeper','Published listing',null,'Pune → Jalgaon; overnight'],
+      ['Shree Vitthala Travels','09:15 PM','Jalgaon','Sleeper / AC Sleeper','Published listing',null,'Pune → Jalgaon; overnight'],
+      ['Jyotiba Tours & Travels','09:30 PM','Jalgaon','Sleeper / AC Sleeper','Published listing',null,'Pune → Jalgaon; overnight']
+    ],
+    'Pune|Bhusawal': [
+      ['MSRTC','07:00 AM','Bhusawal','Parivartan / Ordinary','All Days',null,'Pune → Bhusawal; published MSRTC listing'],
+      ['Pankaj & Jain Travels','08:00 PM','Bhusawal','AC Sleeper (2+1)','Published listing',27,'Pune → Bhusawal; overnight'],
+      ['Pankaj & Jain Travels','08:00 PM','Bhusawal','Volvo 9600 SLX AC Multiaxle Sleeper (2+1)','Published listing',24,'Pune → Bhusawal; overnight'],
+      ['Shri Sairam Travels','07:45 PM','Bhusawal','AC Sleeper (2+1)','Published listing',21,'Pune → Bhusawal; overnight'],
+      ['Sangitam Travels','08:35 PM','Bhusawal','AC Sleeper (2+1)','Published listing',3,'Pune → Muktainagar / Bhusawal corridor'],
+      ['Sangitam Travels','09:00 PM','Bhusawal','AC Sleeper (2+1)','Published listing',1,'Pune → Raver / Bhusawal corridor']
+    ],
+    'Pune|Dhule': [
+      ['MSRTC','05:15 AM','Dhule','Ordinary • via Tarakpur','Published timetable',null,'Published MSRTC timetable'],
+      ['MSRTC','05:40 AM','Dhule','Ordinary • to Amalner','Published timetable',null,'Published MSRTC timetable'],
+      ['MSRTC','05:46 AM','Dhule','Ordinary • to Shindkheda','Published timetable',null,'Published MSRTC timetable'],
+      ['MSRTC','06:00 AM','Dhule','Ordinary • via Sangamner','Published timetable',null,'Published MSRTC timetable'],
+      ['M-S Jogeshwari Enterprises','05:30 PM','Dhule','Bharat Benz AC Sleeper (2+1)','Published listing',15,'Pune → Dhule'],
+      ['Prasanna - Purple Bus','07:45 PM','Dhule','AC Sleeper (2+1)','Published listing',16,'Pune → Dhule'],
+      ['IntrCity SmartBus','05:30 PM','Dhule','AC Sleeper (2+1)','Published listing',22,'Pune → Dhule'],
+      ['Ratna Prabha Travels','07:15 PM','Dhule','AC Sleeper (2+1)','Published listing',20,'Pune → Dhule'],
+      ['Shyamoli Paribahan Pvt Ltd','07:30 PM','Dhule','VOLVO 9600 AC Multiaxle Sleeper (2+1)','Published listing',36,'Pune → Dhule'],
+      ['Jay Santaji Tours And Travels','07:00 PM','Dhule','AC Sleeper (2+1)','Published listing',24,'Pune → Dhule'],
+      ['VRL Travels','08:00 PM','Dhule','Eicher AC Sleeper','Published listing',20,'Pune → Dhule'],
+      ['Sangitam Travels','09:00 PM','Dhule','AC Sleeper (2+1)','Published listing',28,'Pune → Dhule'],
+      ['Hans Travels (I) Pvt Ltd.','07:25 AM','Dhule','Ashok Leyland AC Sleeper','Published listing',21,'Pune → Dhule'],
+      ['Hans Travels (I) Pvt Ltd.','05:00 PM','Dhule','Ashok Leyland AC Sleeper','Published listing',19,'Pune → Dhule'],
+      ['Hans Travels (I) Pvt Ltd.','07:30 PM','Dhule','Eicher AC Sleeper','Published listing',10,'Pune → Dhule'],
+      ['Mohit Travels','08:45 PM','Dhule','2+1 Sleeper AC','Published listing',null,'Pune → Dhule via Jalgaon / Dhule corridor']
+    ],
+    'Dhule|Pune': [
+      ['MSRTC','05:00 AM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune'],
+      ['MSRTC','05:30 AM','Pune','Parivartan • via Pimpri Chinchwad','All Days',null,'Dhule → Pune'],
+      ['MSRTC','08:00 AM','Pune','Parivartan','All Days',null,'Dhule → Pune'],
+      ['MSRTC','08:30 AM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune'],
+      ['MSRTC','09:00 AM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune'],
+      ['MSRTC','09:30 AM','Pune','Parivartan • via Sangamner','All Days',null,'Dhule → Pune'],
+      ['MSRTC','10:00 AM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune'],
+      ['MSRTC','10:30 AM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune'],
+      ['MSRTC','11:00 AM','Pune','Parivartan','All Days',null,'Dhule → Pune'],
+      ['MSRTC','12:30 PM','Pune','Parivartan • via Ahmednagar','All Days',null,'Dhule → Pune']
+    ],
+    'Pune|Indore': [
+      ['Raj Ratan Tours And Travels','04:45 PM','Indore','AC / Sleeper','Published route listing',null,'Pune → Indore'],
+      ['Intercity Travels India Pvt. Ltd','05:30 PM','Indore','AC / Sleeper','Published route listing',null,'Pune → Indore'],
+      ['Hans Travels (I) Private Limited','05:53 AM','Indore','AC / Sleeper','Published route listing',null,'Pune → Indore'],
+      ['IntrCity SmartBus','05:30 PM','Indore','SmartBus / Sleeper options','Published route listing',null,'Pune → Indore'],
+      ['Verma Travels','Evening','Indore','Volvo / AC Sleeper','Published route listing',null,'Pune → Indore']
+    ],
+    'Pune|Bhopal': [
+      ['Raj Ratan Tours And Travels','Published window','Bhopal','AC / Sleeper','Published route listing',null,'Pune → Bhopal'],
+      ['Verma Travels','Published window','Bhopal','AC / Sleeper','Published route listing',null,'Pune → Bhopal'],
+      ['Hans Travels','Published window','Bhopal','AC / Sleeper','Published route listing',null,'Pune → Bhopal'],
+      ['Jogeshwari Enterprises','Published window','Bhopal','Sleeper / AC Sleeper','Published route listing',null,'Pune → Bhopal'],
+      ['Shree Bharuka Travels','Published window','Bhopal','Sleeper / AC Sleeper','Published route listing',null,'Pune → Bhopal']
+    ],
+    'Pune|Lucknow': [
+      ['Multiple private operators','Published window','Lucknow','AC / Sleeper options','Published route listing',null,'Pune → Lucknow']
+    ]
+  },
+  train: {
+    'Pune|Jalgaon': [
+      ['12779','GOA EXPRESS','04:30 AM','12:03 PM','Daily'],
+      ['26101','PUNE–AJNI VANDE BHARAT','06:25 AM','12:18 PM','Daily'],
+      ['11025','PUNE AMRAVATI EXPRESS','11:05 AM','07:50 PM','Daily'],
+      ['11077','JHELUM EXPRESS','05:20 PM','01:15 AM','Daily'],
+      ['12129','AZAD HIND EXPRESS','06:35 PM','02:30 AM','Daily'],
+      ['11039','MAHARASHTRA EXPRESS','10:20 PM','07:03 AM','Daily']
+    ],
+    'Pune|Lucknow': [
+      ['12103','PUNE LJN EXPRESS','11:20 AM','01:20 PM','Schedule varies'],
+      ['11407','PUNE LUCKNOW EXPRESS','10:00 PM','12:50 AM','Schedule varies']
+    ],
+    'Pune|Indore': [
+      ['22943','DAUND INDORE EXPRESS','03:33 PM','08:25 AM','Daily']
+    ]
+  },
+  flight: {
+    'Pune|Jalgaon': [
+      ['GOA-5206','Fly91 / GOA','07:05 PM','08:30 PM','1h 25m','Direct','Economy']
+    ],
+    'Pune|Indore': [
+      ['6E-119','IndiGo','01:10 AM','02:30 AM','1h 20m','Direct','Economy'],
+      ['6E-284','IndiGo','05:20 AM','06:40 AM','1h 20m','Direct','Economy'],
+      ['IX-1236','Air India Express','08:10 AM','09:55 AM','1h 45m','Direct','Economy']
+    ]
+  }
+};
+
+const SLEEPER_NOTES = {
+  'Pune|Jalgaon': {daily:'Daily sleeper/AC sleeper services are listed', source:'redBus route listing', operators:'Shri Sairam Travels, Jogeshwari Enterprises, Shree Vitthala Travels, Jyotiba Tours & Travels', window:'Overnight route; published operators vary by date'},
+  'Pune|Bhusawal': {daily:'Daily sleeper services are listed', source:'ixigo route listing', operators:'Shri Sairam Travels, Pankaj & Jain Travels', window:'Around 8:00–8:45 PM examples; overnight arrivals'},
+  'Pune|Dhule': {daily:'Daily private AC sleeper services are listed', source:'Via.com route listing', operators:'Hans Travels, Shri Sairam Travels, Citizen Travels, Atharva, Vineet, Satnam, Maharashtra Travels', window:'Published examples mainly afternoon/evening'},
+  'Pune|Indore': {daily:'Daily sleeper/Volvo services are listed', source:'redBus route listing', operators:'Raj Ratan, Hans Travels, Verma Travels, Intercity Travels, AP Travels', window:'Overnight services are common'},
+  'Pune|Bhopal': {daily:'Daily sleeper/Volvo services are listed', source:'redBus route listing', operators:'Raj Ratan, Verma Travels, Hans Travels, Jogeshwari Enterprises, Shree Bharuka Travels', window:'Published route window about 2:30 PM–11:55 PM'},
+  'Pune|Lucknow': {daily:'Daily AC/non-AC sleeper options are listed', source:'redBus route listing', operators:'Multiple private operators', window:'Published route window about 10:31 AM–9:00 PM'}
+};
+function getSleeperNote(from,to){ return SLEEPER_NOTES[from+'|'+to] || null; }
+const ROUTE_STOP_DATA={
+ 'Pune|Jalgaon':{boarding:['Akurdi','Alandi Phata','Alephata','Ambegaon Budruk','Aundh','Balaji Nagar','Balewadi','Baner','Bavdhan','Bhawani Peth'],dropping:['Adarsh Nagar','Ajanta Chaufuli','Akashwani Chowk','Bus Stand','Ichha Devi Square','IMR College','Kashinath Lodge','Luxury Bus Parking','Neri Naka']},
+ 'Pune|Bhusawal':{boarding:['Akurdi','Alandi Phata','Ambegaon Budruk','Aundh','Balewadi','Bhawani Peth','Bhosari','Birla Hospital','Chandan Nagar','Chinchwad'],dropping:['Akashwani Chowk','Nahata College','Shivaji Complex','Yawal Road']},
+ 'Pune|Dhule':{boarding:['Akurdi','Alandi Phata','Alephata','Ambegaon Budruk','Aundh','Balaji Nagar','Balewadi','Baner','Bavdhan','Bhawani Peth'],dropping:['Akashwani Chowk','Bara Phattar','Dashehra Maidaan','Dehu Road','Gurudwar','Highway Gurudwara','Hotel Residency Park','Jhansi Rani Chowk','Nagar Naka']},
+ 'Pune|Indore':{boarding:['Akurdi','Alandi Phata','Alephata','Aundh','Balewadi','Baner','Bavdhan','Bhosari','Chakan','Kharadi'],dropping:['Arvindo Hospital','Bapat Square','Bengali Square','Bhawarkuan','Chhotigwaltoli','Crystal IT Park','Dhamnod','Jhulwaniya']}
+};
+function getPublishedStops(from,to){
+ const direct=ROUTE_STOP_DATA[from+'|'+to];
+ if(direct) return direct;
+ const reverse=ROUTE_STOP_DATA[to+'|'+from];
+ if(reverse) return {boarding:[...reverse.dropping].reverse(),dropping:[...reverse.boarding].reverse()};
+ return null;
+}
+
+function verifiedKey(from,to){ return from+'|'+to; }
+function getVerified(kind,from,to){ return (VERIFIED_SCHEDULES[kind]||{})[verifiedKey(from,to)] || []; }
+function hasVerifiedSchedule(kind,from,to){ return getVerified(kind,from,to).length>0; }
+
+function makeVerifiedResults(kind,from,to){
+  const rows=getVerified(kind,from,to);
+  return rows.map((x,i)=>{
+    if(kind==='bus'){
+      const [company,dep,dest,busType,days,seats,routeNote]=x;
+      const sleeper=/sleeper|volvo/i.test(busType);
+      const msrtc=company==='MSRTC';
+      return {id:'verified-bus-'+i,kind:'bus',company,number:msrtc?'MSRTC':'PRIVATE',from,to,dep,arr:'',duration:'Published listing',price:null,seats,seatsSnapshot:seats,totalSeats:null,booked:null,rating:'—',photo:(msrtc?'https://www.hindustantimes.com/ht-img/img/2025/10/01/original/The-decision-has-been-welcomed-by-passengers--many_1759345965090.jpg':'https://s3-ap-southeast-1.amazonaws.com/rbplus/BusImage/Domestic/15878_54_3.png'),stops:[from,routeNote||'Published route',to],verified:true,busType,days,sleeper,msrtc,routeNote};
+    }
+    if(kind==='train'){
+      const [number,company,dep,arr,days]=x;
+      return {id:'verified-train-'+number,kind:'train',company,number,from,to,dep,arr,duration:'Published timetable',price:null,seats:null,totalSeats:null,booked:null,rating:'—',photo:'https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000&q=85',stops:[from,'Scheduled railway stops',to],verified:true,days};
+    }
+    const [number,company,dep,arr,duration,stops,cabin]=x;
+    return {id:'verified-flight-'+number,kind:'flight',company,number,from,to,dep,arr,duration,price:null,seats:null,totalSeats:null,booked:null,rating:'—',photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=85',stops:[from+' Airport',to+' Airport'],verified:true,days:'Published schedule',connecting:stops!=='Direct',cabin};
+  });
+}
+
+function makeBus(from,to,index=0){
+ const op=busOperators[index%busOperators.length];
+ const price=550+((index*173)%1600);
+ const dep=["05:30 AM","07:15 AM","09:45 AM","01:30 PM","06:20 PM","10:30 PM"][index%6];
+ return {id:"bus-"+index+"-"+from+"-"+to,kind:"bus",company:op,number:"TRP-"+(500+index),from,to,dep,arr:"",duration:(3+(index%8))+"h "+(index%2?"30":"00")+"m",price,seats:8+(index%29),totalSeats:40,booked:10+(index%20),rating:(4+(index%10)/10).toFixed(1),photo:"https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1000&q=85",stops:[from,"Main Bus Stand",index%3===0?"Highway Stop":"City Junction",to]};
+}
+
+function makeTrain(from,to,index=0){
+ return {id:"train-"+index+"-"+from+"-"+to,kind:"train",company:trains[index%trains.length],number:"12"+String(100+index).padStart(3,"0"),from,to,dep:["05:40 AM","06:30 AM","08:10 AM","11:20 AM","04:45 PM","09:30 PM"][index%6],arr:"",duration:(3+(index%12))+"h "+(index%2?"20":"05")+"m",price:650+((index*211)%2400),seats:12+(index%55),totalSeats:72,booked:10+(index%35),rating:(4+(index%10)/10).toFixed(1),photo:"https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000&q=85",stops:[from,"Junction",index%2?"Central Station":"Major Junction",to]};
+}
+
+function makeFlight(from,to,index=0){
+ return {id:"flight-"+index+"-"+from+"-"+to,kind:"flight",company:airlines[index%airlines.length],number:"AI-"+(100+index),from,to,dep:["05:45 AM","08:25 AM","11:10 AM","02:40 PM","06:20 PM","09:15 PM"][index%6],arr:"",duration:(1+(index%3))+"h "+(35+index%25)+"m",price:3200+((index*587)%6500),seats:20+(index%110),totalSeats:180,booked:25+(index%100),rating:(4+(index%10)/10).toFixed(1),photo:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=85",stops:[from+" Airport",to+" Airport"]};
+}
+
+
+const maharashtraRoutes=[
+["Mumbai","Pune"],["Pune","Mumbai"],["Pune","Nashik"],["Nashik","Pune"],
+["Pune","Kolhapur"],["Kolhapur","Pune"],["Pune","Satara"],["Satara","Pune"],
+["Pune","Solapur"],["Solapur","Pune"],["Pune","Sangli"],["Sangli","Pune"],
+["Pune","Ahmednagar"],["Ahmednagar","Pune"],["Pune","Shirdi"],["Shirdi","Pune"],
+["Pune","Chhatrapati Sambhajinagar"],["Chhatrapati Sambhajinagar","Pune"],
+["Pune","Jalgaon"],["Jalgaon","Pune"],["Pune","Nagpur"],["Nagpur","Pune"],
+["Pune","Amravati"],["Amravati","Pune"],["Pune","Nanded"],["Nanded","Pune"],
+["Pune","Latur"],["Latur","Pune"],["Pune","Baramati"],["Baramati","Pune"],
+["Pune","Mahabaleshwar"],["Mahabaleshwar","Pune"],["Pune","Ratnagiri"],["Ratnagiri","Pune"],
+["Pune","Chiplun"],["Chiplun","Pune"],["Pune","Alibag"],["Alibag","Pune"],
+["Mumbai","Nashik"],["Nashik","Mumbai"],["Mumbai","Kolhapur"],["Kolhapur","Mumbai"],
+["Mumbai","Ratnagiri"],["Ratnagiri","Mumbai"],["Mumbai","Solapur"],["Solapur","Mumbai"],
+["Mumbai","Chhatrapati Sambhajinagar"],["Chhatrapati Sambhajinagar","Mumbai"],
+["Mumbai","Jalgaon"],["Jalgaon","Mumbai"],["Mumbai","Dhule"],["Dhule","Mumbai"],
+["Mumbai","Alibag"],["Alibag","Mumbai"],["Mumbai","Mahad"],["Mahad","Mumbai"],
+["Mumbai","Satara"],["Satara","Mumbai"],["Mumbai","Sangli"],["Sangli","Mumbai"],
+["Kolhapur","Ratnagiri"],["Ratnagiri","Kolhapur"],["Kolhapur","Solapur"],["Solapur","Kolhapur"],
+["Kolhapur","Chhatrapati Sambhajinagar"],["Chhatrapati Sambhajinagar","Kolhapur"],
+["Kolhapur","Sangli"],["Sangli","Kolhapur"],["Kolhapur","Ichalkaranji"],["Ichalkaranji","Kolhapur"],
+["Nashik","Shirdi"],["Shirdi","Nashik"],["Nashik","Jalgaon"],["Jalgaon","Nashik"],
+["Nashik","Dhule"],["Dhule","Nashik"],["Nashik","Ahmednagar"],["Ahmednagar","Nashik"],
+["Nagpur","Amravati"],["Amravati","Nagpur"],["Nagpur","Akola"],["Akola","Nagpur"],
+["Nagpur","Bhandara"],["Bhandara","Nagpur"],["Nagpur","Chandrapur"],["Chandrapur","Nagpur"],
+["Nagpur","Nanded"],["Nanded","Nagpur"],["Nagpur","Shegaon"],["Shegaon","Nagpur"],
+["Akola","Chhatrapati Sambhajinagar"],["Chhatrapati Sambhajinagar","Akola"],
+["Amravati","Akola"],["Akola","Amravati"],["Amravati","Yavatmal"],["Yavatmal","Amravati"],
+["Nanded","Latur"],["Latur","Nanded"],["Nanded","Parbhani"],["Parbhani","Nanded"],
+["Latur","Dharashiv"],["Dharashiv","Latur"],["Latur","Beed"],["Beed","Latur"],
+["Sangli","Satara"],["Satara","Sangli"],["Satara","Karad"],["Karad","Satara"],
+["Karad","Kolhapur"],["Kolhapur","Karad"],["Solapur","Akluj"],["Akluj","Solapur"],
+["Solapur","Pandharpur"],["Pandharpur","Solapur"],["Kolhapur","Panaji"],["Panaji","Kolhapur"]
+];
+
+function isMaharashtraCity(c){return maharashtraRoutes.some(r=>r[0]===c||r[1]===c);}
+function knownMaharashtraRoute(a,b){return maharashtraRoutes.some(r=>r[0]===a&&r[1]===b);}
+
+const interStateRoutes=[
+  // Maharashtra <-> Madhya Pradesh
+  ["Pune","Indore"],["Indore","Pune"],["Pune","Bhopal"],["Bhopal","Pune"],["Pune","Ujjain"],["Ujjain","Pune"],
+  ["Pune","Gwalior"],["Gwalior","Pune"],["Pune","Jabalpur"],["Jabalpur","Pune"],["Pune","Burhanpur"],["Burhanpur","Pune"],
+  ["Pune","Khandwa"],["Khandwa","Pune"],["Pune","Dewas"],["Dewas","Pune"],["Pune","Ratlam"],["Ratlam","Pune"],
+  ["Mumbai","Indore"],["Indore","Mumbai"],["Mumbai","Bhopal"],["Bhopal","Mumbai"],["Nashik","Indore"],["Indore","Nashik"],
+  ["Dhule","Indore"],["Indore","Dhule"],["Bhusawal","Indore"],["Indore","Bhusawal"],["Jalgaon","Indore"],["Indore","Jalgaon"],
+  ["Nagpur","Indore"],["Indore","Nagpur"],["Nagpur","Bhopal"],["Bhopal","Nagpur"],
+  // Maharashtra <-> Uttar Pradesh
+  ["Pune","Lucknow"],["Lucknow","Pune"],["Pune","Kanpur"],["Kanpur","Pune"],["Pune","Varanasi"],["Varanasi","Pune"],
+  ["Pune","Prayagraj"],["Prayagraj","Pune"],["Pune","Agra"],["Agra","Pune"],["Pune","Mathura"],["Mathura","Pune"],
+  ["Pune","Meerut"],["Meerut","Pune"],["Pune","Bareilly"],["Bareilly","Pune"],["Pune","Moradabad"],["Moradabad","Pune"],
+  ["Pune","Gorakhpur"],["Gorakhpur","Pune"],["Pune","Ayodhya"],["Ayodhya","Pune"],["Pune","Jhansi"],["Jhansi","Pune"],
+  ["Pune","Noida"],["Noida","Pune"],["Pune","Ghaziabad"],["Ghaziabad","Pune"],
+  ["Mumbai","Lucknow"],["Lucknow","Mumbai"],["Mumbai","Kanpur"],["Kanpur","Mumbai"],["Mumbai","Varanasi"],["Varanasi","Mumbai"],
+  ["Mumbai","Prayagraj"],["Prayagraj","Mumbai"],["Mumbai","Agra"],["Agra","Mumbai"],["Mumbai","Noida"],["Noida","Mumbai"],
+  // Key north/south/east India connections
+  ["Pune","Delhi"],["Delhi","Pune"],["Pune","Ahmedabad"],["Ahmedabad","Pune"],["Pune","Surat"],["Surat","Pune"],
+  ["Pune","Hyderabad"],["Hyderabad","Pune"],["Pune","Bengaluru"],["Bengaluru","Pune"],["Pune","Goa"],["Goa","Pune"],
+  ["Mumbai","Delhi"],["Delhi","Mumbai"],["Mumbai","Ahmedabad"],["Ahmedabad","Mumbai"],["Mumbai","Hyderabad"],["Hyderabad","Mumbai"]
+];
+
+const trainRoutePairs=[
+  ["Pune","Jalgaon"],["Pune","Bhusawal"],["Pune","Dhule"],["Pune","Indore"],["Pune","Bhopal"],["Pune","Ujjain"],["Pune","Gwalior"],
+  ["Pune","Jabalpur"],["Pune","Lucknow"],["Pune","Kanpur"],["Pune","Varanasi"],["Pune","Prayagraj"],["Pune","Agra"],["Pune","Delhi"],
+  ["Mumbai","Jalgaon"],["Mumbai","Bhusawal"],["Mumbai","Dhule"],["Mumbai","Indore"],["Mumbai","Bhopal"],["Mumbai","Ujjain"],
+  ["Mumbai","Lucknow"],["Mumbai","Kanpur"],["Mumbai","Varanasi"],["Mumbai","Prayagraj"],["Mumbai","Agra"],["Mumbai","Delhi"],
+  ["Nagpur","Bhopal"],["Nagpur","Indore"],["Nagpur","Jabalpur"],["Nagpur","Lucknow"],["Nagpur","Varanasi"]
+];
+
+const airportMap={
+  "Pune":"Pune Airport (PNQ)","Mumbai":"Mumbai Airport (BOM)","Jalgaon":"Jalgaon Airport (JLG)",
+  "Indore":"Indore Airport (IDR)","Bhopal":"Bhopal Airport (BHO)","Delhi":"Delhi Airport (DEL)",
+  "Lucknow":"Lucknow Airport (LKO)","Varanasi":"Varanasi Airport (VNS)","Prayagraj":"Prayagraj Airport (IXD)",
+  "Agra":"Agra Airport (AGR)","Gwalior":"Gwalior Airport (GWL)","Nagpur":"Nagpur Airport (NAG)",
+  "Ahmedabad":"Ahmedabad Airport (AMD)","Surat":"Surat Airport (STV)","Hyderabad":"Hyderabad Airport (HYD)",
+  "Bengaluru":"Bengaluru Airport (BLR)","Goa":"Goa Airport (GOI)"
+};
+
+function routePairExists(list,a,b){return list.some(r=>(r[0]===a&&r[1]===b)||(r[0]===b&&r[1]===a));}
+function isInterStateRoute(a,b){return routePairExists(interStateRoutes,a,b);}
+function isTrainKnownRoute(a,b){return routePairExists(trainRoutePairs,a,b) || knownMaharashtraRoute(a,b);}
+function hasAirport(c){return !!airportMap[c];}
+function getGeneratedStops(kind,from,to,i){
+  if(kind==='flight'){
+    if(hasAirport(from)&&hasAirport(to)) return [airportMap[from],airportMap[to]];
+    const hub=hasAirport('Mumbai') && from!=='Mumbai' && to!=='Mumbai' ? 'Mumbai Airport (BOM)' : 'Major Airport Hub';
+    return [from+' (Origin)',hub,to+' (Destination)'];
+  }
+  if(from==='Pune'&&to==='Jalgaon') return i%2?[from,'Ahmednagar','Chalisgaon',to]:[from,'Narayangaon','Dhule','Erandol',to];
+  if(from==='Pune'&&to==='Bhusawal') return [from,'Ahmednagar','Nashik/Jalgaon','Bhusawal'];
+  if(from==='Pune'&&to==='Dhule') return [from,'Ahmednagar','Nashik','Dhule'];
+  if(to==='Pune'&&from==='Jalgaon') return i%2?[from,'Erandol','Dhule','Ahmednagar',to]:[from,'Chalisgaon','Ahmednagar',to];
+  if(to==='Pune'&&from==='Bhusawal') return [from,'Jalgaon','Nashik','Ahmednagar',to];
+  if(to==='Pune'&&from==='Dhule') return [from,'Nashik','Ahmednagar',to];
+  if(isInterStateRoute(from,to)) return [from,'State Border / Major Junction',to];
+  return [from,'Main Bus Stand',i%2?'City Junction':'Highway Stop',to];
+}
+
+function generateAllRoutes(kind,from,to){
+  const verified=makeVerifiedResults(kind,from,to);
+  if(verified.length) return verified;
+  // Do not fabricate transport schedules. Unknown routes return no timetable.
+  return [];
+}
+
+function timeMinutes(s){
+ let [x,ap]=s.split(" ");let [h,m]=x.split(":").map(Number);
+ if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;return h*60+m;
+}
+
+function setType(t,el){
+ type=t;
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+ el.classList.add("active");
+ document.getElementById("transportForm").classList.toggle("hidden",t==="hotel");
+ document.getElementById("hotelForm").classList.toggle("hidden",t!=="hotel");
+}
+
+function swapPlaces(){
+ let a=document.getElementById("from"),b=document.getElementById("to"),v=a.value;a.value=b.value;b.value=v;
+}
+
+function quickRoute(a,b){
+ document.getElementById("from").value=a;
+ document.getElementById("to").value=b;
+ document.getElementById("date").value=selectedTripDate||document.getElementById("date").value;
+ document.getElementById("search").scrollIntoView({behavior:"smooth"});
+ searchRoutes();
+}
+
+function searchRoutes(){
+ let from=document.getElementById("from").value;
+ let to=document.getElementById("to").value;
+ selectedTripDate=document.getElementById("date").value;
+
+ if(!from||!to){toast("Please select both boarding and dropping cities.");return}
+ if(from===to){toast("Boarding and dropping cities cannot be the same.");return}
+ if(!selectedTripDate){toast("Please select your trip date.");return}
+
+ results=generateAllRoutes(type,from,to);
+ renderResults();
+}
+
+function renderResults(){
+ document.getElementById("resultsSection").classList.remove("hidden");
+ document.getElementById("resultsTitle").innerText=(type==="bus"?"Bus":type==="train"?"Train":"Flight")+" Results";
+ document.getElementById("resultsSub").innerText=results.length+" published entries found • Trip date: "+formatDate(selectedTripDate)+" • Verified/public timetable data";
+ const box=document.getElementById("results"); box.innerHTML="";
+ if(!results.length){box.innerHTML='<div class="result text-center p-5"><i class="bi bi-search fs-1 text-muted"></i><h5 class="mt-3">No verified route loaded</h5><p class="text-muted">This route is not currently loaded with verified timetable data. Use a live provider search for current inventory.</p></div>';return;}
+ if(type==='bus'){
+   const msrtc=results.filter(r=>r.msrtc), priv=results.filter(r=>!r.msrtc);
+   const section=(items)=>items.length?items.map(busCard).join(''):`<div class="result text-center p-4"><h5>No verified services loaded</h5><p class="text-muted mb-0">Use the live provider button for current date-specific inventory.</p></div>`;
+   box.innerHTML=`<div class="bus-subnav"><button id="msrtcTab" class="active" onclick="showBusPage('msrtc')">🏛️ MSRTC Services <span class="badge text-bg-light ms-1">${msrtc.length}</span></button><button id="sleeperTab" onclick="showBusPage('sleeper')">🛏️ Private & Sleeper Buses <span class="badge text-bg-light ms-1">${priv.length}</span></button></div><div id="msrtcPage" class="bus-page active"><div class="page-note"><b>MSRTC page:</b> Government bus services and published timetable entries for this route. Live seat/fare inventory is checked through MSRTC.</div>${section(msrtc)}</div><div id="sleeperPage" class="bus-page"><div class="page-note"><b>Sleeper/private page:</b> Private operators, sleeper types and published route information. Current seats and fares depend on the selected date.</div>${section(priv)}</div>`;
+ } else {
+   box.innerHTML=results.map(r=>resultCard(r)).join('');
+ }
+ document.getElementById("resultsSection").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function showBusPage(page){
+ const ms=document.getElementById('msrtcPage'), sl=document.getElementById('sleeperPage');
+ const mt=document.getElementById('msrtcTab'), st=document.getElementById('sleeperTab');
+ if(!ms||!sl)return;
+ const isMs=page==='msrtc'; ms.classList.toggle('active',isMs); sl.classList.toggle('active',!isMs);
+ mt.classList.toggle('active',isMs); st.classList.toggle('active',!isMs);
+}
+function busCard(r){
+ const rd=getPublishedStops(r.from,r.to);
+ const boarding=rd?.boarding||[];
+ const dropping=rd?.dropping||[];
+ const allRoute=(r.stops||[]).filter(Boolean);
+ const seatText=r.seatsSnapshot!=null
+   ? `<div class="bus-seat-panel"><div class="fw-bold text-success"><i class="bi bi-person-check-fill"></i> ${r.seatsSnapshot} seats available</div><div class="small text-muted">Latest published seat snapshot — not guaranteed live</div></div>`
+   : `<div class="bus-seat-panel"><div class="fw-bold"><i class="bi bi-person-check"></i> Seat availability</div><div class="small text-muted">Live count available from provider</div></div>`;
+ const photo=r.photo||'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1000&q=85';
+ const safe=JSON.stringify(r).replace(/'/g,"&#39;");
+ return `<div class="result mb-3"><div class="row g-3 align-items-start">
+  <div class="col-lg-2 col-md-3">
+    <img class="bus-card-photo" src="${photo}" alt="${r.company} bus">
+    <div class="small text-muted mt-1"><i class="bi bi-camera"></i> Bus reference photo</div>
+  </div>
+  <div class="col-lg-3 col-md-4">
+    <b class="fs-6">${r.company}</b>
+    <div class="small text-muted">${r.number}</div>
+    <span class="pill">${r.msrtc?'🏛️ MSRTC':'Private'}</span>
+    ${r.sleeper?`<span class="badge text-bg-dark ms-1">🛏️ Sleeper</span>`:''}
+    <div class="small mt-2"><b>Bus type:</b> ${r.busType||'Published bus service'}</div>
+    <div class="small mt-1"><b>Service:</b> ${r.days||'Published schedule'}</div>
+    ${seatText}
+  </div>
+  <div class="col-lg-4 col-md-5">
+    <div class="fw-bold">${r.dep}</div>
+    <div class="route mt-1"><span>${r.from}</span><span class="line"></span><span>${r.to}</span></div>
+    <small class="text-muted">${r.duration}</small>
+    <div class="route-line-box"><b><i class="bi bi-signpost-2"></i> Route</b><div class="small mt-1">${r.routeNote||allRoute.join(' → ')}</div></div>
+    ${(boarding.length||dropping.length)?`
+      <div class="bus-info-scroll">
+        <div class="p-2"><b class="small">📍 Boarding / Stops</b><div>${boarding.map(x=>`<span class="stop-chip">${x}</span>`).join('')}</div>
+        <hr class="my-2"><b class="small">🏁 Dropping / Stops</b><div>${dropping.map(x=>`<span class="stop-chip">${x}</span>`).join('')}</div></div>
+      </div>`:''}
+  </div>
+  <div class="col-lg-3 text-md-end">
+    <div class="price">Fare: ₹${r.price||"Select seats"}</div>
+    <small class="text-muted d-block mb-2">Fare changes by journey date</small>
+    <div class="d-grid gap-2">
+      <button class="btn-primaryx" onclick='openDetails(${safe})'>Route, Stops & Photo</button>
+      <button class="btn btn-primary btn-sm fw-bold" onclick='openSeatSelection(${safe})'>💺 Select Seats</button>
+      ${!r.msrtc?`<button class="btn btn-outline-danger btn-sm fw-bold" onclick='openProvider("redbus",${safe})'>redBus</button>`:`<button class="btn btn-outline-dark btn-sm fw-bold" onclick='openProvider("msrtc",${safe})'>Official MSRTC</button>`}
+    </div>
+  </div>
+ </div></div>`;
+}
+function resultCard(r){
+ const icon=r.kind==="train"?"bi-train-front":"bi-airplane";
+ return `<div class="result"><div class="row align-items-center g-3"><div class="col-md-1"><div class="logo"><i class="bi ${icon}"></i></div></div><div class="col-md-3"><b>${r.company}</b><div class="small text-muted">${r.number}</div></div><div class="col-md-3"><div class="fw-bold">${r.dep}</div><div class="route mt-1"><span>${r.from}</span><span class="line"></span><span>${r.to}</span></div><small class="text-muted">${r.arr?'Arrival '+r.arr:''} • ${r.duration}</small><div class="small mt-1"><b>Days:</b> ${r.days||'Published schedule'}</div></div><div class="col-md-2"><b>Check live availability</b><div class="small text-muted">Fare/inventory varies by date</div></div><div class="col-md-3 text-md-end"><button class="btn-primaryx" onclick='openDetails(${JSON.stringify(r).replace(/'/g,"&#39;")})'>View Details</button></div></div></div>`;
+}
+function buildProviderUrl(provider,r={}){
+ const from=(r.from||document.getElementById('from').value||'Pune').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+ const to=(r.to||document.getElementById('to').value||'Jalgaon').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+ if(provider==='redbus') return `https://www.redbus.in/bus-tickets/${from}-to-${to}`;
+ if(provider==='abhibus') return `https://www.abhibus.com/bus-ticket-booking`;
+ if(provider==='msrtc') return `https://npublic.msrtcors.com/reservation-home`;
+ return `https://www.redbus.in/bus-tickets/${from}-to-${to}`;
+}
+function openProvider(provider,r={}){const url=buildProviderUrl(provider,r);window.open(url,"_blank","noopener,noreferrer");const label=provider==='redbus'?'redBus':provider==='msrtc'?'MSRTC':'AbhiBus';toast(label+" opened for "+(r.from||document.getElementById('from').value)+" → "+(r.to||document.getElementById('to').value)+". Select the travel date there for live fare and seats.");}
+function openLiveSeats(r=activeItem){ if(r) openSeatSelection(r); }
+function sortResults(v){if(v==="time")results.sort((a,b)=>timeMinutes(a.dep)-timeMinutes(b.dep));renderResults();}
+
+function openDetails(r){
+ activeItem=r;selected=[];
+ document.getElementById("detailsTitle").innerText=r.company+" • "+(r.number||'');
+ const stops=(r.stops||[]).filter(Boolean);
+ const rd=getPublishedStops(r.from,r.to);
+ const boarding=rd?.boarding||[], dropping=rd?.dropping||[];
+ const stopHtml=rd?`
+   <div class="mt-3">
+    <h6 class="fw-bold">📍 Boarding points / route stops</h6>
+    <div class="bus-info-scroll p-2">${boarding.map((x,i)=>`<div class="route-stop"><b>${i+1}. ${x}</b></div>`).join('')}</div>
+    <h6 class="fw-bold mt-3">🏁 Dropping points</h6>
+    <div class="bus-info-scroll p-2">${dropping.map((x,i)=>`<div class="route-stop"><b>${i+1}. ${x}</b></div>`).join('')}</div>
+   </div>`:`<div class="mt-3"><b>Route:</b> ${stops.join(' → ')}</div>`;
+ document.getElementById("detailsBody").innerHTML=`<div class="row g-3">
+ <div class="col-lg-6"><img class="vehicle-photo" src="${r.photo}" alt="${r.company} bus"><small class="text-muted d-block mt-2">Real reference photo; not a live vehicle feed.</small>${r.kind==='bus'?stopHtml:''}</div>
+ <div class="col-lg-6"><h5 class="fw-bold">${r.from} → ${r.to}</h5>
+ <p class="mb-1"><b>Trip Date:</b> ${formatDate(selectedTripDate)}</p>
+ <p class="mb-1"><b>Departure:</b> ${r.dep}</p>${r.arr?`<p class="mb-1"><b>Arrival:</b> ${r.arr}</p>`:''}
+ <p class="mb-1"><b>Bus/Service:</b> ${r.busType||r.company}</p><p class="mb-1"><b>Days:</b> ${r.days||'Published schedule'}</p>
+ <p class="mb-1"><b>Route:</b> ${r.routeNote||stops.join(' → ')}</p>
+ <div class="bus-seat-panel mt-3"><b>💺 Seat availability</b><div class="mt-1">${r.seatsSnapshot!=null?`<span class="text-success fw-bold">${r.seatsSnapshot} seats in latest published snapshot</span><div class="small text-muted">For the selected date, use live provider availability.</div>`:'Seat selection available'}</div></div>
+ <p class="mb-1 mt-3"><b>Fare:</b> Fare calculated from selected seats</p><hr>
+ ${r.kind==='bus'?`<button class="btn-primaryx" onclick="openLiveSeats()">💺 Select Seats</button>`:''}
+ ${r.kind==='bus'?`<div class="mt-3 d-flex gap-2 flex-wrap"><button class="btn btn-outline-danger fw-bold" onclick='openProvider("redbus",${JSON.stringify(r).replace(/'/g,"&#39;")})'>redBus</button><button class="btn btn-outline-dark fw-bold" onclick='openProvider("abhibus",${JSON.stringify(r).replace(/'/g,"&#39;")})'>AbhiBus</button>${r.msrtc?`<button class="btn btn-outline-secondary fw-bold" onclick='openProvider("msrtc",${JSON.stringify(r).replace(/'/g,"&#39;")})'>Official MSRTC</button>`:''}</div>`:''}
+ </div></div>`;
+ new bootstrap.Modal("#detailsModal").show();
+}
+function openSeatSelection(r){
+  activeItem=r; selected=[];
+  document.getElementById('seatTitle').innerText=(r.company||'Bus')+' — Select Seats';
+  document.getElementById('seatRoute').innerText=(r.from||'')+' → '+(r.to||'')+' • '+(r.dep||'')+' • '+(r.busType||'Bus');
+  document.getElementById('routeStops').innerHTML=`<div class="small"><b>Route:</b> ${r.from||''} → ${r.to||''}</div><div class="small mt-2"><b>Stops:</b></div><div class="bus-info-scroll p-2 mt-1">${(r.stops||[]).map((x,i)=>`<div class="route-stop"><b>${i+1}. ${x}</b></div>`).join('')}</div><div class="small mt-2 text-muted">Seat layout is a selectable TripGo booking layout. Availability shown here is based on the stored route snapshot, not a live operator inventory feed.</div>`;
+  buildSeats(); updateSelected();
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('seatModal')).show();
+}
+function buildSeats(){
+  const grid=document.getElementById('seatGrid');
+  const total=activeItem?.totalSeats||40;
+  const snapshot=Number.isFinite(Number(activeItem?.seatsSnapshot))?Number(activeItem.seatsSnapshot):Math.max(8,Math.floor(total*0.45));
+  const availableCount=Math.min(total, Math.max(0,snapshot));
+  const bookedCount=total-availableCount;
+  const cols=4;
+  let html='<div class="w-100 text-center small text-muted mb-2">Front of bus ↑</div>';
+  for(let i=1;i<=total;i++){
+    const booked=i>availableCount;
+    const aisle=(i%4===3)?'<span style="width:10px;display:inline-block"></span>':'';
+    html+=`<button type="button" class="seat ${booked?'booked':'available'}" ${booked?'disabled':''} data-seat="${i}" onclick="toggleSeat(${i},this)">${i}${aisle}</button>`;
+  }
+  grid.innerHTML=html+`<div class="w-100 text-center small text-muted mt-2">Rear of bus ↓ • ${availableCount} available / ${bookedCount} booked in stored snapshot</div>`;
+}
+function toggleSeat(n,el){
+  if(el.disabled)return;
+  const idx=selected.indexOf(n);
+  if(idx>=0){selected.splice(idx,1);el.classList.remove('selected');}
+  else {selected.push(n);el.classList.add('selected');}
+  updateSelected();
+}
+function updateSelected(){
+  const names=[...selected].sort((a,b)=>a-b);
+  document.getElementById('selectedSeats').innerText=names.length?names.join(', '):'None';
+  const base=Number(activeItem?.price)||0;
+  document.getElementById('totalFare').innerText=base?('₹'+(base*names.length).toLocaleString('en-IN')):'Fare shown after selecting seats';
+}
+function continueBooking(){
+  if(!activeItem){toast('Select a bus first.');return;}
+  if(!selected.length){toast('Please select at least one available seat.');return;}
+  toast('Selected seat(s): '+selected.sort((a,b)=>a-b).join(', '));
+}
+function openSeatModal(){ if(activeItem) openSeatSelection(activeItem); }
+
+function continueBooking(){if(activeItem?.kind==='bus'){openLiveSeats(activeItem);return}toast('Live booking is handled by the transport provider.');}
+function searchHotels(){let city=document.getElementById("hotelCity").value||"Goa";let hotels=[["Taj Resort","5 Star",7499,4.8],["Sea View Resort","4 Star",4299,4.5],["Palm Tree Hotel","3 Star",2499,4.2]].map((x,i)=>({company:x[0],number:x[1],from:city,to:"",dep:"Check-in 2 PM",price:x[2],rating:x[3],photo:["https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1000&q=85","https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1000&q=85","https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=85"][i]}));results=hotels;document.getElementById("resultsSection").classList.remove("hidden");document.getElementById("resultsTitle").innerText="Hotels in "+city;document.getElementById("resultsSub").innerText=hotels.length+" demo properties • Select check-in/check-out dates above";let box=document.getElementById("results");box.innerHTML=hotels.map(h=>`<div class="result"><div class="row align-items-center g-3"><div class="col-md-3"><img class="photo" src="${h.photo}"></div><div class="col-md-5"><h5 class="fw-bold">${h.company}</h5><span class="pill">★ ${h.rating}</span><p class="text-muted mt-2 mb-0">${h.number} • ${city}</p></div><div class="col-md-4 text-md-end"><div class="price">₹${h.price.toLocaleString("en-IN")}</div><small class="text-muted">per night</small><br><button class="btn-primaryx mt-2" onclick="toast('Hotel room selected. Login required for final booking.')">Select Room</button></div></div></div>`).join("")}
+function openAuth(mode){authMode=mode;document.getElementById("authTitle").innerText=mode==="login"?"Login":"Create Account";document.getElementById("registerFields").classList.toggle("hidden",mode==="login");document.getElementById("authSwitchText").innerText=mode==="login"?"New here?":"Already have an account?";document.getElementById("authSwitch").innerText=mode==="login"?"Create account":"Login";new bootstrap.Modal("#authModal").show()}
+function toggleAuth(){openAuth(authMode==="login"?"register":"login")}
+function submitAuth(){
+ let email=document.getElementById("authEmail").value.trim().toLowerCase(),pass=document.getElementById("authPassword").value;
+ if(!email||!pass||pass.length<4){toast("Enter a valid email and password (4+ characters).");return}
+ let users=JSON.parse(localStorage.getItem("tripgo_users")||"[]");
+ if(authMode==="register"){
+   if(users.some(u=>u.email===email)){toast("Account already exists. Please login.");return}
+   let name=document.getElementById("regName").value.trim()||"TripGo User";users.push({name,email,password:pass});localStorage.setItem("tripgo_users",JSON.stringify(users));localStorage.setItem("tripgo_user",JSON.stringify({name,email}));bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();updateUser();toast("Account created successfully.");
+ }else{
+   let u=users.find(x=>x.email===email&&x.password===pass);if(!u){toast("Invalid email or password. Register first if needed.");return}localStorage.setItem("tripgo_user",JSON.stringify({name:u.name,email:u.email}));bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();updateUser();toast("Welcome back, "+u.name+"!");
+ }
+}
+function updateUser(){
+  const u=JSON.parse(localStorage.getItem("tripgo_user")||"null");
+  const a=document.getElementById("userArea");
+  if(!u){
+    a.innerHTML=`<button class="btn btn-outline-danger rounded-pill px-4" onclick="openAuth('login')">Login / Register</button>`;
+    return;
+  }
+  a.innerHTML=`<div class="dropdown"><button class="btn btn-danger rounded-pill dropdown-toggle" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> ${u.name}</button><ul class="dropdown-menu dropdown-menu-end"><li><span class="dropdown-item-text small">${u.email}</span></li><li><hr class="dropdown-divider"></li><li><button class="dropdown-item" onclick="logout()">Logout</button></li></ul></div>`;
+}
+function logout(){localStorage.removeItem("tripgo_user");updateUser();toast("Logged out.")}
+function toast(msg){let t=document.getElementById("toastMsg");t.innerText=msg;t.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.add("hidden"),3000)}
+populateCities();
+setDefaultDates();
+updateUser();
+</script>
+</body>
+</html>
